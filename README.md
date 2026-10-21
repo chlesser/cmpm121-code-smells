@@ -60,3 +60,56 @@ While I won't write out the constructor, now one can create an item with an easy
 Item coal = new Item(14, "Coal", 10, 10)
 ```
 At the end of this, we have taken these scattered value and combined them into a single place where they can be easily edited. This takes away the risk of forgetting details here and there in code.
+
+## Feature Envy
+Feature envy is when a class uses methods and properties from another class more than its own. This problem arises when you manipulate the data of a class within the methods of another class. You would do this because the class lacks a method of its own to manipulate or get its own data, so you relegate that duty to another class when you want them to interact with each other. Feature envy is dangerous because intertwines the two classes. Because of this, any changes to one class will affect the other. It may even lead to the affected class to stop working as intended or produce errors.
+
+Feature envy can be solved by moving and extracting functions. Accessing data from another class can be replaced with access and manipulation functions from that class. Or, if the method only uses data from this other class, just move that method to the other class. To prevent feature envy, avoid directly calling properties from another class. Instead, make sure that they are only called by its own class, and if you wish to access or manipulate these properties, create a method within that class and call that instead.
+
+Many examples of feature envy can be found in my GameMaker project. In this particular example, the function for when a player heals tries to update the UI's health sprites. This function is called by the player, yet it accesses data from the UI object by directly calling them.
+```gml
+function HealPlayer(Regen, Type)
+{
+		if (Type == BODY_DMG)
+		{
+			for (var i = 0; i < array_length(obj_UI.body_HEALTH); i++)
+			{
+				with (obj_UI.body_HEALTH[i])
+				{
+					resolve(global.player_BODY_HEALTH, min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
+				}
+			}
+			global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
+		}
+}
+```
+The problem with this implementation is that, if the UI object does not exist, this code breaks and produces an error. Additionally, if there are any issues with the UI object at all, then the scope of where issues may lie is extended to this function, rather than just to the functions of the UI object.
+
+One way this can be improved is by making this a method of the UI object.
+```gml
+update_HEALTH = function(newHealth)
+{
+    for (var i = 0; i < array_length(body_HEALTH); i++)
+    {
+      with (body_HEALTH[i])
+      {
+        resolve(global.player_BODY_HEALTH, newHealth);
+      }
+    }
+};
+```
+Then, you can update the HealPlayer function.
+```gml
+function HealPlayer(Regen, Type)
+{
+		if (Type == BODY_DMG)
+		{
+      with (obj_UI)
+      {
+        update_HEALTH(min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
+      }
+			global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
+		}
+}
+```
+This way, the UI object's variables remain outside of the scope of the player.
