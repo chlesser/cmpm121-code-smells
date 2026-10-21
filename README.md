@@ -59,3 +59,4 @@ While I won't write out the constructor, now one can create an item with an easy
 ```c++
 Item coal = new Item(14, "Coal", 10, 10)
 ```
+At the end of this, we have taken these scattered value and combined them into a single place where they can be easily edited. This takes away the risk of forgetting details here and there in code.
