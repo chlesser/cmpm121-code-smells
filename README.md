@@ -40,5 +40,8 @@ public static int getRandomIDByArea() {
   else if(20 < num && num <= 30) return item2ID
   //...
 }
-
 ```
+
+There are issues here beyond just shotgun surgery, but for the purposes of this example, one can see that to change anything about the coal drop rate, cost, or item names, I would hunt down particular values in particular files. Drop rate has to be adjusted each time. A cleaner example here is to merge the "shotgun" surgery into a much more precise operation each time.
+
+First, we would create a class for an item with 
