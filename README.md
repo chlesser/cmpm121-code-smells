@@ -42,6 +42,20 @@ public static int getRandomIDByArea() {
 }
 ```
 
-There are issues here beyond just shotgun surgery, but for the purposes of this example, one can see that to change anything about the coal drop rate, cost, or item names, I would hunt down particular values in particular files. Drop rate has to be adjusted each time. A cleaner example here is to merge the "shotgun" surgery into a much more precise operation each time.
+There are issues here beyond just shotgun surgery, but for the purposes of this example, one can see that to change anything about the coal drop rate, cost, or item names, I would hunt down particular values in particular functions in particular files. A cleaner example here is to merge the "shotgun" surgery into a much more precise operation each time.
 
-First, we would create a class for an item with 
+First, we would create a class for an item with _Combine Functions Into Class (144)_
+```c++
+class Item {
+    public:
+        int ID;
+        char[] name;
+        int cost;
+        int dropChance;
+};
+```
+
+While I won't write out the constructor, now one can create an item with an easy initialization in the same place.
+```c++
+Item coal = new Item(14, "Coal", 10, 10)
+```
