@@ -27,4 +27,18 @@ int coalCost = 10;
 int item2Cost = 30
 //...
 
+//random drops
+public static int getRandomIDByArea() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> distrib(1, 100);
+  int random_num = distrib(gen);
+
+  //...
+  if(0 < num && num <= 10) return item1ID
+  else if(10 < num && num <= 20) return coalID
+  else if(20 < num && num <= 30) return item2ID
+  //...
+}
+
 ```
