@@ -70,17 +70,17 @@ Many examples of feature envy can be found in my GameMaker project. In this part
 ```gml
 function HealPlayer(Regen, Type)
 {
-		if (Type == BODY_DMG)
+	if (Type == BODY_DMG)
+	{
+		for (var i = 0; i < array_length(obj_UI.body_HEALTH); i++)
 		{
-			for (var i = 0; i < array_length(obj_UI.body_HEALTH); i++)
+			with (obj_UI.body_HEALTH[i])
 			{
-				with (obj_UI.body_HEALTH[i])
-				{
-					resolve(global.player_BODY_HEALTH, min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
-				}
+				resolve(global.player_BODY_HEALTH, min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
 			}
-			global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
 		}
+		global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
+	}
 }
 ```
 The problem with this implementation is that, if the UI object does not exist, this code breaks and produces an error. Additionally, if there are any issues with the UI object at all, then the scope of where issues may lie is extended to this function, rather than just to the functions of the UI object.
@@ -90,26 +90,26 @@ One way this can be improved is by making this a method of the UI object.
 update_HEALTH = function(newHealth)
 {
     for (var i = 0; i < array_length(body_HEALTH); i++)
-    {
-      with (body_HEALTH[i])
-      {
-        resolve(global.player_BODY_HEALTH, newHealth);
-      }
-    }
+	{
+		with (body_HEALTH[i])
+		{
+			resolve(global.player_BODY_HEALTH, newHealth);
+		}
+	}
 };
 ```
 Then, you can update the HealPlayer function.
 ```gml
 function HealPlayer(Regen, Type)
 {
-		if (Type == BODY_DMG)
+	if (Type == BODY_DMG)
+	{
+		with (obj_UI)
 		{
-      with (obj_UI)
-      {
-        update_HEALTH(min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
-      }
-			global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
+			update_HEALTH(min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX));
 		}
+		global.player_BODY_HEALTH = min(global.player_BODY_HEALTH + Regen, global.player_BODY_HEALTH_MAX);
+	}
 }
 ```
 This way, the UI object's variables remain outside of the scope of the player.
