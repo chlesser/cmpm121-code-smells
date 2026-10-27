@@ -1,7 +1,7 @@
 # cmpm121-code-smells
 **Names**: Aaron Tan, Charles Lesser, Julian Tran
 
-**Chosen Smells**: Shotgun Surgery, Feature Envy, Large Class
+**Chosen Smells**: Shotgun Surgery, Feature Envy, Primitive Obsession
 
 ## Shotgun Surgery
 Ever added something or made a change to a game, such as adding a new item or type of item, and found yourself scouring through many functions to add one precise value? We all did at one point. I can pinpoint one exact situation - when I made a clicker game based on minecraft. 14 year old me programmed it in Java in the same way I had seen when modding the game, which was with a thousand different values in different places. Let's take the example of adding a new item, coal, to the "market" I had made.
@@ -113,3 +113,66 @@ function HealPlayer(Regen, Type)
 }
 ```
 This way, the UI object's variables remain outside of the scope of the player.
+
+## Primitive Obsession
+Primitive Obsession is a code smell that occurs when programmers rely too heavily on basic data types such as strings, integers, and booleans to represent more complicated concepts. Although these primitive types are useful for storing simple values, using them to represent something with its own rules or behavior can make code harder to maintain.
+
+This smell often happens because using primitive values is quicker and easier than creating separate classes. However, as a program grows, developers might find themselves repeatedly checking and manipulating the same values throughout their code. This can lead to duplicated logic and make it easier for mistakes to occur.
+
+One way to fix Primitive Obsession is through Fowler's _Replace Primitive with Object (174)_ refactoring. Instead of using primitive values to represent something with its own properties or rules, we can create a dedicated class to handle that information. This makes the code easier to organize and allows related logic to be kept in one place.
+
+For example, imagine we're creating a pet simulator where pets have different rarities that determine their money multipliers and display colors. A simple implementation in TypeScript might look like this:
+```typescript
+function getMultiplier(rarity: string): number {
+    if (rarity === "Common") return 1;
+    if (rarity === "Rare") return 2;
+    if (rarity === "Legendary") return 5;
+    return 1;
+}
+
+function getColor(rarity: string): string {
+    if (rarity === "Common") return "gray";
+    if (rarity === "Rare") return "blue";
+    if (rarity === "Legendary") return "gold";
+    return "gray";
+}
+
+let petRarity = "Legendary";
+
+console.log(getMultiplier(petRarity)); // 5
+console.log(getColor(petRarity)); // gold
+```
+
+While this implementation works, both functions rely on strings to determine the correct result. If we accidentally misspell a rarity, such as "Legendery", the functions won't recognize it and will instead return their default values. Additionally, if we wanted to add more rarities, we would have to update both functions.
+
+To improve this, we can create a PetRarity class that stores the properties associated with each rarity.
+```typescript
+class PetRarity {
+    constructor(
+        public name: string,
+        public multiplier: number,
+        public color: string
+    ) {}
+}
+
+const common = new PetRarity("Common", 1, "gray");
+const rare = new PetRarity("Rare", 2, "blue");
+const legendary = new PetRarity("Legendary", 5, "gold");
+
+function getMultiplier(rarity: PetRarity): number {
+    return rarity.multiplier;
+}
+
+function getColor(rarity: PetRarity): string {
+    return rarity.color;
+}
+
+let petRarity = legendary;
+
+console.log(getMultiplier(petRarity)); // 5
+console.log(getColor(petRarity)); // gold
+```
+
+With this refactoring, the rarity information is stored in one class instead of being represented by arbitrary strings. The functions no longer need to check multiple string values because they can directly access the properties of the PetRarity object.
+
+This also makes adding new rarities easier since we can define them in the class without modifying the existing functions. TypeScript can also catch errors when a function expecting a PetRarity receives an ordinary string.
